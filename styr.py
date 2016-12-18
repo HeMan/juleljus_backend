@@ -6,6 +6,8 @@ import Adafruit_GPIO.SPI as SPI
 
 import paho.mqtt.client as mqtt
 
+import json
+
 class juleljus(object):
     def __init__(self, leds=50):
         self.leds = leds
@@ -51,19 +53,15 @@ class juleljus(object):
         self.pixels.show()
 
     def dispatch(self, pattern, delay=0.2):
-        method = getattr(self, pattern)
+        method = getattr(self, "pattern_"+pattern, self.pattern_red_in_white)
         #method(delay)	
         method()
 
+    def patterns(self):
+        return [pattern[8:] for pattern in dir(self) if pattern.startswith("pattern_")]
+
 light = juleljus()
-#light.running_red(delay=0.05)
 
-#time.sleep(2)
-
-#light.clear()
-
-#pixels.clear()
-#pixels.show()
 def on_connect(client, userdata, flags, rc):
     print("Connected with result code "+str(rc))
 
@@ -73,17 +71,19 @@ def on_connect(client, userdata, flags, rc):
 
 
 def on_message(client, userdata, msg):
-    print("nu")
-    print(userdata)
-    print(msg.payload)
-    light.dispatch(pattern=msg.payload)
+    if (msg.topic == "juleljus/patterns"):
+        print(light.patterns())
+        client.publish("juleljus/return",json.dumps(light.patterns()))
+    if (msg.topic == "juleljus/run"):
+        print(userdata)
+        print(msg.topic)
+        print(msg.payload)
+        light.dispatch(pattern=msg.payload)
 
 client = mqtt.Client()
 client.on_connect = on_connect
 client.on_message = on_message
 
-client.connect("192.168.128.7")
-
-#client.subscribe("juleljus/#")
+client.connect("blacken.linuxguru.se")
 
 client.loop_forever()
