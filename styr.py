@@ -52,6 +52,12 @@ class juleljus(object):
         self.pixels.clear()
         self.pixels.show()
 
+    def pattern_rainbow(self, delay=0.2):
+        self.pixels.clear()
+        for led in range(self.leds):
+            self.pixels.set_pixel_hsv(led, (led*1.0)/self.leds, 1, 1)
+        self.pixels.show()
+
     def dispatch(self, pattern, delay=0.2):
         method = getattr(self, "pattern_"+pattern, self.pattern_red_in_white)
         #method(delay)	
