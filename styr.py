@@ -35,12 +35,11 @@ class juleljus(object):
             time.sleep(delay)
 
     def pattern_red_in_white(self, delay=0.2):
-        print("white in red")
         self.pixels.clear()
         for led in range(self.leds / 2):
             self.pixels.set_pixel_rgb(led*2, 255, 0, 0)
             self.pixels.set_pixel_rgb(led*2+1, 255, 255, 255)
-            self.pixels.show()
+        self.pixels.show()
 
     def pattern_running_white_blue(self, delay=0.2):
         for led in range(self.leds-1):
@@ -57,6 +56,32 @@ class juleljus(object):
         for led in range(self.leds):
             self.pixels.set_pixel_hsv(led, (led*1.0)/self.leds, 1, 1)
         self.pixels.show()
+
+    def pattern_red_white_bounce(self, delay=0.02):
+        for led in range(self.leds):
+            self.pixels.clear()
+            self.pixels.set_pixel_rgb(led, 255, 0, 0)
+            self.pixels.set_pixel_rgb(self.leds - led - 1, 255, 255, 255)
+            self.pixels.show()
+            time.sleep(delay)
+        for led in range(self.leds):
+            self.pixels.clear()
+            self.pixels.set_pixel_rgb(self.leds - led - 1, 255, 0, 0)
+            self.pixels.set_pixel_rgb(led, 255, 255, 255)
+            self.pixels.show()
+            time.sleep(delay)
+        for led in range(self.leds):
+            self.pixels.clear()
+            self.pixels.set_pixel_rgb(led, 255, 0, 0)
+            self.pixels.set_pixel_rgb(self.leds - led - 1, 255, 255, 255)
+            self.pixels.show()
+            time.sleep(delay)
+        for led in range(self.leds):
+            self.pixels.clear()
+            self.pixels.set_pixel_rgb(self.leds - led - 1, 255, 0, 0)
+            self.pixels.set_pixel_rgb(led, 255, 255, 255)
+            self.pixels.show()
+            time.sleep(delay)
 
     def dispatch(self, pattern, delay=0.2):
         method = getattr(self, "pattern_"+pattern, self.pattern_red_in_white)
