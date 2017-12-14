@@ -30,6 +30,14 @@ import paho.mqtt.client as mqtt
 
 import json
 
+import os
+
+import ssl
+
+MQTT_SERVER = os.getenv('MQTT_SERVER','test.mosquitto.com')
+MQTT_USERNAME = os.getenv('MQTT_USERNAME','')
+MQTT_PASSWORD = os.getenv('MQTT_PASSWORD','')
+
 class juleljus(object):
     def __init__(self, leds=50):
         self.leds = leds
@@ -107,7 +115,6 @@ class juleljus(object):
 
     def dispatch(self, pattern, delay=0.2):
         method = getattr(self, "pattern_"+pattern, self.pattern_red_in_white)
-        #method(delay)	
         method()
 
     def patterns(self):
@@ -136,7 +143,9 @@ def on_message(client, userdata, msg):
 client = mqtt.Client()
 client.on_connect = on_connect
 client.on_message = on_message
+client.tls_set(tls_version=ssl.PROTOCOL_TLSv1_2)
+client.username_pw_set(MQTT_USERNAME, MQTT_PASSWORD)
 
-client.connect("blacken.linuxguru.se")
+client.connect(MQTT_SERVER, 8883)
 
 client.loop_forever()
