@@ -42,7 +42,7 @@ class juleljus(object):
     def __init__(self, leds=50):
         self.leds = leds
         self.spi = SPI.SpiDev(0, 0)
-        self.pixels = Adafruit_WS2801.WS2801Pixels(self.leds,spi=self.spi )
+        self.pixels = Adafruit_WS2801.WS2801Pixels(self.leds, spi=self.spi)
 
     def clear(self):
         self.pixels.clear()
@@ -120,7 +120,9 @@ class juleljus(object):
     def patterns(self):
         return [pattern[8:] for pattern in dir(self) if pattern.startswith("pattern_")]
 
+
 light = juleljus()
+
 
 def on_connect(client, userdata, flags, rc):
     print("Connected with result code "+str(rc))
@@ -133,12 +135,13 @@ def on_connect(client, userdata, flags, rc):
 def on_message(client, userdata, msg):
     if (msg.topic == "juleljus/patterns"):
         print(light.patterns())
-        client.publish("juleljus/return",json.dumps(light.patterns()))
+        client.publish("juleljus/return", json.dumps(light.patterns()))
     if (msg.topic == "juleljus/run"):
         print(userdata)
         print(msg.topic)
         print(msg.payload)
-        light.dispatch(pattern=msg.payload)
+        light.dispatch(pattern=json.loads(msg.payload))
+
 
 client = mqtt.Client()
 client.on_connect = on_connect
